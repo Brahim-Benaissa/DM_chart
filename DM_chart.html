@@ -9,31 +9,25 @@
   <style>
     body {
       margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden; /* prevents internal scrolling */
       background: #05070d;
       color: #eaeaea;
       font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
     }
     .container {
       width: 100%;
       height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 2%;
-      box-sizing: border-box;
-      border-radius: 20px;
-      background: radial-gradient(circle at center, #0b0e18 0%, #05070d 100%);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      max-width: none; /* remove max-width */
+      margin: 0;
+      padding: 1rem;
+      border-radius: 0;
+      box-shadow: none;
     }
     h2 {
-      position: relative;
-      width: 100%;
-      height: calc(100% - 200px); /* leave room for title + slider */
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.6rem;
+      letter-spacing: 0.5px;
     }
     p {
       text-align: center;
@@ -44,14 +38,14 @@
     .canvas-wrapper {
       position: relative;
       width: 100%;
-      height: 400px;
+      height: 300px;
     }
     canvas {
       position: absolute;
-      width: 100%;
-      height: 100%;
       top: 0;
       left: 0;
+      width: 100%;
+      height: 100%;
     }
     .slider-section {
       text-align: center;
@@ -93,11 +87,6 @@
 </head>
 <body>
   <div class="container">
-    <h2>Galaxy Rotation Curves & Dark Matter Halo</h2>
-    <p>
-      Adjust the slider to see how <span style="color:#ff4b4b;">dark matter</span>
-      changes the galaxy’s rotation curve and forms an invisible halo around it.
-    </p>
 
     <div class="canvas-wrapper">
       <canvas id="galaxyCanvas"></canvas>
@@ -195,8 +184,6 @@
         ]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
         animation: { duration: 800, easing: 'easeOutQuart' },
         plugins: {
           legend: { position: 'bottom', labels: { color:'#eee' } },
