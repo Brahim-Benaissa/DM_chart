@@ -24,22 +24,11 @@
       position: relative;
       overflow: hidden;
     }
-    h2 {
-      text-align: center;
-      font-weight: 700;
-      font-size: 1.6rem;
-      letter-spacing: 0.5px;
-    }
-    p {
-      text-align: center;
-      color: #aaa;
-      max-width: 600px;
-      margin: 0.5rem auto 1.5rem;
-    }
     .canvas-wrapper {
       position: relative;
       width: 100%;
-      height: 400px;
+      /* Maintain 2:1 aspect ratio for chart and galaxy */
+      padding-top: 50%; /* height = 50% of width */
     }
     canvas {
       position: absolute;
@@ -88,7 +77,6 @@
 </head>
 <body>
   <div class="container">
-
     <div class="canvas-wrapper">
       <canvas id="galaxyCanvas"></canvas>
       <canvas id="chartCanvas"></canvas>
@@ -110,20 +98,6 @@
     const galaxyCanvas = document.getElementById("galaxyCanvas");
     const chartCanvas = document.getElementById("chartCanvas");
     const gctx = galaxyCanvas.getContext("2d");
-
-    function resizeCanvases() {
-      const wrapper = document.querySelector('.canvas-wrapper');
-      const w = wrapper.clientWidth;
-      const h = wrapper.clientHeight;
-
-      galaxyCanvas.width = w;
-      galaxyCanvas.height = h;
-      chartCanvas.width = w;
-      chartCanvas.height = h;
-
-      drawGalaxy(parseFloat(dmSlider.value));
-    }
-    window.addEventListener('resize', resizeCanvases);
 
     // === Stars ===
     const stars = [];
@@ -195,6 +169,7 @@
         ]
       },
       options: {
+        maintainAspectRatio: false,
         animation: { duration: 800, easing: 'easeOutQuart' },
         plugins: {
           legend: { position: 'bottom', labels: { color:'#eee' } },
@@ -216,6 +191,22 @@
     const slider = document.getElementById('dmSlider');
     const dmValue = document.getElementById('dmValue');
     const caption = document.getElementById('caption');
+
+    function resizeCanvases() {
+      const wrapper = document.querySelector('.canvas-wrapper');
+      const w = wrapper.clientWidth;
+      const h = wrapper.clientHeight;
+
+      galaxyCanvas.width = w;
+      galaxyCanvas.height = h;
+      chartCanvas.width = w;
+      chartCanvas.height = h;
+
+      drawGalaxy(parseFloat(slider.value));
+      chart.resize();
+    }
+
+    window.addEventListener('resize', resizeCanvases);
 
     slider.addEventListener('input', () => {
       const dm = parseFloat(slider.value);
