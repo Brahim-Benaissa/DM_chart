@@ -122,7 +122,7 @@
 
       const maxHalo = w * 0.2 * (1 + 4 * dmFactor);
       const gradient = gctx.createRadialGradient(cx, cy, 0, cx, cy, maxHalo);
-      gradient.addColorStop(0, `rgba(0, 180, 255, ${0.1 + 0.25 * dmFactor})`);
+      gradient.addColorStop(0, `rgba(255, 0, 0, ${0.2 + 0.05 * dmFactor})`);
       gradient.addColorStop(1, `rgba(0, 0, 0, 0)`);
       gctx.fillStyle = gradient;
       gctx.fillRect(0, 0, w, h);
@@ -152,8 +152,8 @@
             data: observed_base,
             borderColor: '#ff4b4b',
             borderWidth: 4,
-            pointRadius: 6,
-            pointHoverRadius: 6,
+            pointRadius: 4,
+            pointHoverRadius: 4,
             pointBackgroundColor: '#ff4b4b',
             tension: 0.35
           },
@@ -162,8 +162,8 @@
             data: expected_base,
             borderColor: '#00b4d8',
             borderWidth: 4,
-            pointRadius: 6,
-            pointHoverRadius: 6,
+            pointRadius: 4,
+            pointHoverRadius: 4,
             pointBackgroundColor: '#00b4d8',
             tension: 0.35
           }
@@ -173,10 +173,10 @@
         maintainAspectRatio: false,
         animation: { duration: 800, easing: 'easeOutQuart' },
         plugins: {
-          legend: { position: 'bottom', labels: { color:'#fff', font:{size:14}, usePointStyle:true, pointStyle:'circle', pointRadius:6, padding:15 } },
+          legend: { position: 'bottom', labels: { color:'#fff', font:{size:14}, usePointStyle:true, pointStyle:'circle',  padding:15 } },
           title: {
             display: true,
-            text: 'Galaxy Rotation Velocity vs Radius',
+          //  text: 'Galaxy Rotation Velocity vs Radius',  
             color: '#fff',
             font: { size: 18 }
           }
