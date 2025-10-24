@@ -15,13 +15,14 @@
       overflow-x: hidden;
     }
     .container {
-      width: 100%;
-      height: 100%;
-      max-width: none; /* remove max-width */
-      margin: 0;
-      padding: 1rem;
-      border-radius: 0;
-      box-shadow: none;
+      max-width: 800px;
+      margin: 3rem auto;
+      padding: 2rem;
+      border-radius: 20px;
+      background: radial-gradient(circle at center, #0b0e18 0%, #05070d 100%);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
     }
     h2 {
       text-align: center;
@@ -38,7 +39,7 @@
     .canvas-wrapper {
       position: relative;
       width: 100%;
-      height: 300px;
+      height: 400px;
     }
     canvas {
       position: absolute;
@@ -87,6 +88,11 @@
 </head>
 <body>
   <div class="container">
+    <h2>Galaxy Rotation Curves & Dark Matter Halo</h2>
+    <p>
+      Adjust the slider to see how <span style="color:#ff4b4b;">dark matter</span>
+      changes the galaxy’s rotation curve and forms an invisible halo around it.
+    </p>
 
     <div class="canvas-wrapper">
       <canvas id="galaxyCanvas"></canvas>
