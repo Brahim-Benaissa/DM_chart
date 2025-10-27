@@ -91,7 +91,7 @@
       <br />
       <input type="range" id="dmSlider" min="0" max="1" step="0.01" value="0" />
       <div id="caption">
-        Classical Newtonian motion → rotation speed falls with distance.
+        Classical Newtonian motion, rotation speed falls with distance.
       </div>
     </div>
   </div>
@@ -244,9 +244,9 @@
       chart.update();
       drawGalaxy(dm);
 
-      if (dm < 0.3) caption.textContent = "Classical Newtonian motion → rotation speed falls with distance.";
+      if (dm < 0.3) caption.textContent = "Classical Newtonian motion, rotation speed falls with distance.";
       else if (dm < 0.7) caption.textContent = "Adding dark matter flattens the curve, keeping stars moving faster.";
-      else caption.textContent = "With full dark matter effect → rotation curve remains flat, and the halo extends far beyond visible stars.";
+      else caption.textContent = "With full dark matter effect, rotation curve remains flat and the halo extends far beyond visible stars.";
     });
 
     resizeCanvases();
