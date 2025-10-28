@@ -100,6 +100,25 @@
     .canvas-wrapper:hover #shareButton {
       opacity: 1;
     }
+
+    /* Toast notification */
+    #toast {
+      visibility: hidden;
+      min-width: 200px;
+      margin-left: -100px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 10px;
+      position: fixed;
+      z-index: 999;
+      left: 50%;
+      bottom: 30px;
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
   </style>
 </head>
 <body>
@@ -119,6 +138,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Toast notification -->
+  <div id="toast"></div>
 
   <script>
     const galaxyCanvas = document.getElementById("galaxyCanvas");
@@ -161,13 +183,9 @@
       }
     }
 
-
-
-    // const r_values = [0.27e+20, 0.54e+20, 0.81e+20, 1.08e+20, 1.35e+20, 1.62e+20, 1.89e+20, 2.15e+20, 2.42e+20];
     const r_values = [0.27, 0.54, 0.81, 1.08, 1.35, 1.62, 1.89, 2.15, 2.42];
     const observed_base = [24800, 46200, 60500, 69600, 77500, 82900, 84100, 85600, 87600];
     const expected_base = [40702, 50361, 54260, 55436, 55127, 54034, 52531, 50838, 49086];
-
 
     const ctx = chartCanvas.getContext('2d');
     const chart = new Chart(ctx, {
@@ -213,30 +231,16 @@
               padding: 10
             }
           },
-          title: {
-            display: false,
-            color: '#fff',
-            font: { size: 18 }
-          }
+          title: { display: false, color: '#fff', font: { size: 18 } }
         },
         scales: {
           x: {
-            title: {
-              display: true,
-              text: 'Radius (×10²⁰ m) SPARC data Galaxy UGC06399',
-              color: '#fff',
-              font: { size: 14 }
-            },
+            title: { display: true, text: 'Radius (×10²⁰ m) SPARC data Galaxy UGC06399', color: '#fff', font: { size: 14 } },
             grid: { color: 'rgba(255,255,255,0.1)' },
             ticks: { color: '#fff', font: { size: 12 } }
           },
           y: {
-            title: {
-              display: true,
-              text: 'Velocity (m/s)',
-              color: '#fff',
-              font: { size: 14 }
-            },
+            title: { display: true, text: 'Velocity (m/s)', color: '#fff', font: { size: 14 } },
             min: 0,
             max: 130000,
             grid: { color: 'rgba(255,255,255,0.1)' },
@@ -279,17 +283,29 @@
 
     resizeCanvases();
 
-    // Copy URL function for the Share button
+    // Copy URL function for the Share button using toast notifications
     document.getElementById('shareButton').addEventListener('click', function() {
       const link = window.location.href;
       navigator.clipboard.writeText(link)
-        .then(() => {
-          alert('Link copied to clipboard!');
-        })
-        .catch(err => {
-          alert('Failed to copy the link.');
-        });
+        .then(() => showToast('Link copied to clipboard!'))
+        .catch(() => showToast('Failed to copy the link.'));
     });
+
+    // Function to show a toast notification
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.visibility = 'visible';
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+
+      // Hide after 3 seconds
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.style.visibility = 'hidden', 500);
+      }, 3000);
+    }
   </script>
 </body>
 </html>
