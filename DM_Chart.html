@@ -161,9 +161,13 @@
       }
     }
 
-    const r_values = [1,2,3,4,5,6,7,8,9,10];
-    const observed_base = [1,1,1,1,1,1,1,1,1,1];
-    const expected_base = [1,0.71,0.58,0.5,0.45,0.41,0.38,0.35,0.33,0.32];
+
+
+    // const r_values = [0.27e+20, 0.54e+20, 0.81e+20, 1.08e+20, 1.35e+20, 1.62e+20, 1.89e+20, 2.15e+20, 2.42e+20];
+    const r_values = [0.27, 0.54, 0.81, 1.08, 1.35, 1.62, 1.89, 2.15, 2.42];
+    const observed_base = [24800, 46200, 60500, 69600, 77500, 82900, 84100, 85600, 87600];
+    const expected_base = [40702, 50361, 54260, 55436, 55127, 54034, 52531, 50838, 49086];
+
 
     const ctx = chartCanvas.getContext('2d');
     const chart = new Chart(ctx, {
@@ -182,7 +186,7 @@
             tension: 0.35
           },
           {
-            label: 'Expected Velocity',
+            label: 'Calculated Velocity',
             data: expected_base,
             borderColor: '#00b4d8',
             borderWidth: 2,
@@ -219,7 +223,7 @@
           x: {
             title: {
               display: true,
-              text: 'Radius (arbitrary units)',
+              text: 'Radius (×10²⁰ m)',
               color: '#fff',
               font: { size: 14 }
             },
@@ -229,12 +233,12 @@
           y: {
             title: {
               display: true,
-              text: 'Velocity (arbitrary units)',
+              text: 'Velocity (m/s)',
               color: '#fff',
               font: { size: 14 }
             },
             min: 0,
-            max: 1.2,
+            max: 130000,
             grid: { color: 'rgba(255,255,255,0.1)' },
             ticks: { color: '#fff', font: { size: 12 } }
           }
@@ -268,9 +272,9 @@
       chart.update();
       drawGalaxy(dm);
 
-      if (dm < 0.3) caption.textContent = "Classical Newtonian motion, rotation speed falls with distance.";
-      else if (dm < 0.7) caption.textContent = "Adding dark matter flattens the curve, keeping stars moving faster.";
-      else caption.textContent = "With full dark matter effect, rotation curve remains flat and the halo extends far beyond visible stars.";
+      if (dm < 0.3) caption.textContent = "Rotation speed falls with distance.";
+      else if (dm < 0.7) caption.textContent = "Adding dark matter flattens the curve.";
+      else caption.textContent = "Rotation curve flat and the Dark matter halo extends far beyond visible stars.";
     });
 
     resizeCanvases();
