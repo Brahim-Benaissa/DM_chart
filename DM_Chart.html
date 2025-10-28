@@ -146,7 +146,7 @@
 
       const maxHalo = w * 0.2 * (1 + 4 * dmFactor);
       const gradient = gctx.createRadialGradient(cx, cy, 0, cx, cy, maxHalo);
-      gradient.addColorStop(0, `rgba(255, 0, 0, ${0.2 + 0.05 * dmFactor})`);
+      gradient.addColorStop(0, `rgba(255, 0, 0, ${0.3 + 0.5 * dmFactor})`);
       gradient.addColorStop(1, `rgba(0, 0, 0, 0)`);
       gctx.fillStyle = gradient;
       gctx.fillRect(0, 0, w, h);
@@ -223,7 +223,7 @@
           x: {
             title: {
               display: true,
-              text: 'Radius (×10²⁰ m)',
+              text: 'Radius (×10²⁰ m) SPARC data Galaxy UGC06399',
               color: '#fff',
               font: { size: 14 }
             },
