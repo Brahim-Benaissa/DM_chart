@@ -1,31 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-104TPV326N"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-104TPV326N');
   </script>
-
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
   new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
   j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
   })(window,document,'script','dataLayer','GTM-TRGMTJZG');</script>
-  <!-- End Google Tag Manager -->
-
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Galaxy Rotation Curve & Dark Matter Halo</title>
 
-  <!-- ✅ SEO Meta Tags -->
   <meta name="description" content="Explore how dark matter affects galaxy rotation curves through an interactive simulation. Adjust the dark matter halo and see how it changes stellar velocity across galactic radii." />
   <meta name="keywords" content="galaxy rotation curve, dark matter halo, dark matter simulation, astrophysics, galaxy velocity, astronomy data visualization, SPARC data, Milky Way rotation, cosmic physics" />
   <meta name="author" content="Galaxy Rotation Curve Project" />
@@ -36,323 +30,704 @@
   <meta name="twitter:title" content="Galaxy Rotation Curve & Dark Matter Halo" />
   <meta name="twitter:description" content="Visualize the impact of dark matter on galactic motion with this interactive physics demo." />
 
-
-
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
-
-
-
   <style>
-    body {
-      margin: 0;
-      background: #05070d;
-      color: #eaeaea;
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
+    :root{
+      --bg:#05070d; --ink:#eaeaea; --mut:#9aa3b2;
+      --cy:#00b4d8; --rd:#ff4b4b; --pu:#b266ff; --am:#ffc107; --te:#26c6da;
     }
-    .container {
-      max-width: 800px;
-      margin: 3rem auto;
-      padding: 2rem;
-      border-radius: 20px;
-      background: radial-gradient(circle at center, #0b0e18 0%, #05070d 100%);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-      position: relative;
-      overflow: hidden;
-    }
-    .canvas-wrapper {
-      position: relative;
-      width: 100%;
-      padding-top: 50%;
-    }
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 110%;
-    }
-    .slider-section {
-      text-align: center;
-      margin-top: 2rem;
-    }
-    input[type="range"] {
-      width: 70%;
-      appearance: none;
-      height: 8px;
-      border-radius: 4px;
-      background: linear-gradient(90deg, #ff4b4b 0%, #1976d2 100%);
-      outline: none;
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      appearance: none;
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #fff 0%, #00b4d8 80%);
-      box-shadow: 0 0 15px #00b4d8, 0 0 20px #ff4b4b;
-      cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-      border: 2px solid #fff;
-    }
-    input[type="range"]::-webkit-slider-thumb:hover {
-      transform: scale(1.3);
-      box-shadow: 0 0 25px #00b4d8, 0 0 30px #ff4b4b;
-    }
-    #caption {
-      color: #bbb;
-      margin-top: 0.3rem;
-      font-size: 0.95rem;
-      font-style: italic;
-    }
-    .slider-section label {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: #00b4d8;
-      cursor: pointer;
+    *{box-sizing:border-box}
+    html, body { height:100%; }
+    body{
+      margin:0; background:var(--bg); color:var(--ink);
+      font-family:'Inter',sans-serif; overflow:hidden;
     }
 
-    /* Share button styles */
-    #shareButton {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 8px 12px;
-      background-color: #00b4d8;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+    /* ---------- one unified scene ---------- */
+    .scene{
+      position:fixed; inset:0;
+      background:radial-gradient(circle at 50% 42%, #0b0e18 0%, #05070d 100%);
+    }
+    #sky{
+      position:absolute; inset:0; width:100%; height:100%;
+      display:block; cursor:crosshair;
     }
 
-    #shareButton:hover {
-      background-color: #ff4b4b;
+    /* top-center control pill: [slider] [fullscreen] */
+    .topctl{
+      position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:8;
+      width:min(60vw, 430px);
+      display:flex; align-items:center; gap:10px;
+      background:rgba(7,10,18,.66); border:1px solid rgba(255,255,255,.09);
+      border-radius:12px; padding:10px 12px 12px 16px;
+      backdrop-filter:blur(4px);
+    }
+    .topctl .track{ flex:1 1 auto; min-width:0; }
+
+    /* hover tooltip label — left of the bar on wide screens, below otherwise */
+    .topctl label{
+      position:absolute; top:calc(100% + 8px); left:50%; transform:translateX(-50%);
+      white-space:nowrap; cursor:pointer;
+      font-weight:600; font-size:.64rem; color:#a7e6f7;
+      background:rgba(7,10,18,.94); border:1px solid rgba(255,255,255,.14);
+      border-radius:8px; padding:6px 11px; line-height:1;
+      opacity:0; pointer-events:none;
+      transition:opacity .18s ease;
+    }
+    .topctl:hover label,
+    .topctl.show-label label{ opacity:1; }
+    @media (min-width:1150px){
+      .topctl label{
+        top:50%; left:auto; right:calc(100% + 10px);
+        transform:translateY(-50%);
+      }
     }
 
-    .canvas-wrapper:hover #shareButton {
-      opacity: 1;
+    /* thin slider */
+    input[type="range"]{
+      -webkit-appearance:none; appearance:none;
+      width:100%; height:16px; background:transparent;
+      margin:0; cursor:pointer; outline:none;
+    }
+    input[type="range"]::-webkit-slider-runnable-track{
+      height:4px; border-radius:2px;
+      background:linear-gradient(90deg, rgba(255,75,75,.85) 0%, #1976d2 100%);
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none; appearance:none;
+      width:16px; height:16px; border-radius:50%; margin-top:-6px;
+      background:radial-gradient(circle at 35% 35%, #eafcff 0%, #00b4d8 55%, #01485c 100%);
+      border:1px solid rgba(255,255,255,.28);
+      box-shadow:0 0 10px rgba(0,180,216,.55), 0 1px 3px rgba(0,0,0,.6);
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    input[type="range"]:hover::-webkit-slider-thumb{
+      transform:scale(1.18);
+      box-shadow:0 0 16px rgba(0,180,216,.9), 0 1px 3px rgba(0,0,0,.6);
+    }
+    input[type="range"]:focus-visible{
+      box-shadow:0 0 0 3px rgba(0,180,216,.22); border-radius:6px;
+    }
+    input[type="range"]::-moz-range-track{
+      height:4px; border-radius:2px;
+      background:linear-gradient(90deg, rgba(255,75,75,.85) 0%, #1976d2 100%);
+    }
+    input[type="range"]::-moz-range-thumb{
+      width:16px; height:16px; border-radius:50%;
+      background:radial-gradient(circle at 35% 35%, #eafcff 0%, #00b4d8 55%, #01485c 100%);
+      border:1px solid rgba(255,255,255,.28);
+      box-shadow:0 0 10px rgba(0,180,216,.55), 0 1px 3px rgba(0,0,0,.6);
     }
 
-    /* Toast notification */
-    #toast {
-      visibility: hidden;
-      min-width: 200px;
-      margin-left: -100px;
-      background-color: #333;
-      color: #fff;
-      text-align: center;
-      border-radius: 4px;
-      padding: 10px;
-      position: fixed;
-      z-index: 999;
-      left: 50%;
-      bottom: 30px;
-      font-size: 16px;
-      opacity: 0;
-      transition: opacity 0.5s ease, transform 0.5s ease;
+    /* fullscreen button — right end of the bar */
+    #fsButton{
+      flex:none; width:26px; height:26px; padding:0;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(0,180,216,.15); color:#7fe3f7;
+      border:1px solid rgba(0,180,216,.4); border-radius:8px;
+      cursor:pointer; font-family:inherit;
+      transition:background .15s ease, color .15s ease, border-color .15s ease;
+    }
+    #fsButton:hover{
+      background:rgba(0,180,216,.32); color:#c9f2ff; border-color:rgba(0,180,216,.7);
+    }
+    #fsButton svg{ width:14px; height:14px; display:block; }
+    #fsButton .ic-cmp{ display:none; }
+    #fsButton.is-fs .ic-exp{ display:none; }
+    #fsButton.is-fs .ic-cmp{ display:block; }
+
+    #shareButton{
+      position:absolute; top:12px; right:10px; z-index:9;
+      padding:5px 9px; background:rgba(0,180,216,.15); color:#7fe3f7;
+      border:1px solid rgba(0,180,216,.4); border-radius:8px;
+      cursor:pointer; font-size:.66rem; font-family:inherit; white-space:nowrap;
+    }
+    #shareButton:hover{
+      background:rgba(255,75,75,.2); color:#ffb0b0; border-color:rgba(255,75,75,.5);
+    }
+
+    /* compact color key, top-left */
+    .legend{
+      position:absolute; top:12px; left:10px; z-index:5;
+      display:flex; flex-direction:column; gap:3px;
+      font-size:.64rem; color:#c7d0dc;
+      background:rgba(5,8,14,.55); padding:6px 9px; border-radius:8px;
+      pointer-events:none; max-width:140px;
+    }
+    .legend i{
+      display:inline-block; width:8px; height:8px; border-radius:50%;
+      margin-right:5px; vertical-align:1px;
+    }
+    .legend span{ white-space:nowrap; }
+
+    /* chart panels */
+    .panel{
+      position:absolute; top:calc(64% - 3px); bottom:10px; z-index:4;
+      display:flex; flex-direction:column;
+      background:rgba(9,12,20,.85);
+      border:1px solid rgba(255,255,255,.07); border-radius:12px;
+      padding:5px 7px 7px;
+    }
+    .panel-left { left:10px;  width:calc(33.8% - 10px); }
+    .panel-right{ right:10px; width:calc(33.8% - 10px); }
+    .panel-title{
+      flex:none; font-weight:600; color:#cfd8e3; margin-bottom:3px;
+      font-size:clamp(.58rem, 1.1vw, .74rem);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .chartbox{ flex:1 1 auto; min-height:0; position:relative; }
+
+    /* hover legend box — floats ABOVE the panel, outside the curve area */
+    .chart-legend{
+      position:absolute; bottom:calc(100% + 8px); z-index:6;
+      display:flex; flex-wrap:wrap; align-items:center;
+      gap:6px 14px;
+      background:rgba(7,10,18,.94); border:1px solid rgba(255,255,255,.14);
+      border-radius:8px; padding:7px 11px;
+      font-size:.62rem; color:#c7d0dc; line-height:1;
+      max-width:min(360px, 60vw);
+      opacity:0; pointer-events:none;
+      transition:opacity .18s ease;
+    }
+    .panel-left  .chart-legend{ left:0; }
+    .panel-right .chart-legend{ right:0; }
+    .panel:hover .chart-legend,
+    .panel.show-legend .chart-legend{ opacity:1; }
+    .chart-legend .li{ display:flex; align-items:center; gap:5px; white-space:nowrap; }
+    .chart-legend .sw{ width:11px; height:0; border-top:2.5px solid; border-radius:2px; }
+    .chart-legend .sw.dash{ border-top-style:dashed; }
+    .chart-legend .dot{ width:7px; height:7px; border-radius:50%; }
+
+    /* toast */
+    #toast{
+      visibility:hidden; min-width:200px; margin-left:-100px;
+      background-color:#333; color:#fff; text-align:center; border-radius:6px;
+      padding:10px; position:fixed; z-index:999; left:50%; bottom:30px;
+      font-size:14px; opacity:0;
+      transition:opacity .5s ease, transform .5s ease;
+    }
+    sup{ font-size:.65em; }
+
+    @media (max-width:720px){ .legend{ display:none; } }
+    @media (max-width:640px){
+      .panel{ padding:4px 5px 6px; border-radius:10px; }
+      .panel-left { left:6px;  width:calc(32% - 6px); }
+      .panel-right{ right:6px; width:calc(32% - 6px); }
+      .topctl{ padding:8px 9px 10px 12px; gap:8px; }
+      .topctl label{ font-size:.56rem; padding:5px 9px; }
+      .chart-legend{ font-size:.56rem; gap:4px 9px; padding:5px 8px; }
     }
   </style>
 </head>
 <body>
-
   <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TRGMTJZG"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TRGMTJZG"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
+  <div class="scene">
+    <canvas id="sky"></canvas>
 
-  <div class="container">
-    <div class="canvas-wrapper">
-      <canvas id="galaxyCanvas"></canvas>
-      <canvas id="chartCanvas"></canvas>
-      <button id="shareButton">Share Link</button>
+    <div class="legend">
+      <span><i style="background:#ffe6b0"></i>stars</span>
+      <span><i style="background:#4dd0e1"></i>gas</span>
+      <span><i style="background:#b266ff"></i>dark matter halo (invisible)</span>
     </div>
 
-    <div class="slider-section">
-      <label for="mezziSlider" style="font-size: 24px;"><b>Add Dark Matter</b></label>
-      <br />
-      <input type="range" id="dmSlider" min="0" max="1" step="0.01" value="0" />
-      <div id="caption">
-        Newtonian model results do not align with observed flat rotation curves.
+    <div class="topctl" id="topctl">
+      <div class="track">
+        <input type="range" id="dmSlider" min="0" max="1" step="0.01" value="0" aria-label="Add the dark matter halo">
       </div>
+      <button id="fsButton" type="button" aria-label="Enter fullscreen" title="Fullscreen">
+        <svg class="ic-exp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
+        </svg>
+        <svg class="ic-cmp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>
+        </svg>
+      </button>
+      <label for="dmSlider">Add the dark matter halo</label>
     </div>
+
+    <button id="shareButton">Share</button>
+
+    <section class="panel panel-left">
+      <div class="panel-title">Rotation curve decomposition</div>
+      <div class="chartbox" id="curveBox">
+        <canvas id="curveChart"></canvas>
+      </div>
+      <div class="chart-legend">
+        <span class="li"><span class="sw" style="border-color:#ffc107"></span>Bulge</span>
+        <span class="li"><span class="sw" style="border-color:#26c6da"></span>Disk + gas</span>
+        <span class="li"><span class="sw dash" style="border-color:#b266ff"></span>Dark matter halo</span>
+        <span class="li"><span class="sw" style="border-color:#f2f4fb; border-top-width:3px"></span>Total</span>
+        <span class="li"><span class="dot" style="background:#ff4b4b"></span>Observed (SPARC)</span>
+      </div>
+    </section>
+
+    <section class="panel panel-right">
+      <div class="panel-title">Enclosed mass</div>
+      <div class="chartbox" id="massBox">
+        <canvas id="massChart"></canvas>
+      </div>
+      <div class="chart-legend">
+        <span class="li"><span class="sw" style="border-color:#ffc107"></span>Bulge</span>
+        <span class="li"><span class="sw" style="border-color:#26c6da"></span>Disk + gas</span>
+        <span class="li"><span class="sw dash" style="border-color:#b266ff"></span>Dark matter halo</span>
+        <span class="li"><span class="sw" style="border-color:#f2f4fb; border-top-width:3px"></span>Total</span>
+        <span class="li"><span class="sw dash" style="border-color:rgba(255,255,255,.5)"></span>M ∝ R</span>
+      </div>
+    </section>
   </div>
 
-  <!-- Toast notification -->
   <div id="toast"></div>
 
   <script>
-    const galaxyCanvas = document.getElementById("galaxyCanvas");
-    const chartCanvas = document.getElementById("chartCanvas");
-    const gctx = galaxyCanvas.getContext("2d");
+  /* ================= PHYSICS (unchanged calculations) ================= */
+  const G = 4.3009e-6;                       // kpc (km/s)^2 / Msun
+  const R_OBS = [0.875,1.75,2.625,3.5,4.375,5.25,6.125,6.965,7.84]; // kpc
+  const V_OBS = [24.8,46.2,60.5,69.6,77.5,82.9,84.1,85.6,87.6];     // km/s
+  const V_ERR = V_OBS.map(v => v*0.05);
 
-    const stars = [];
-    const STAR_COUNT = 400;
-    for (let i = 0; i < STAR_COUNT; i++) {
-      const r = Math.random() * 100;
-      const angle = Math.random() * 2 * Math.PI;
-      stars.push({
-        x: 0.5 + (r / 200) * Math.cos(angle),
-        y: 0.5 + (r / 200) * Math.sin(angle),
-        brightness: Math.random() * 0.8 + 0.2
-      });
-    }
+  const BULGE = { M: 1.3e9, a: 0.9 };
+  const DISK  = { M: 2.6e9, a: 2.6 };
+  const Fexp  = x => 1 - Math.exp(-x)*(1 + x + x*x/2);
+  const v2c   = (R,c) => G*c.M*Fexp(R/c.a)/R;
+  const v2bar = R => v2c(R,BULGE) + v2c(R,DISK);
+  const Mbar  = R => BULGE.M*Fexp(R/BULGE.a) + DISK.M*Fexp(R/DISK.a);
+  const pisoF = (R,rc) => { const u = R/rc; return 1 - Math.atan(u)/u; };
 
-    function drawGalaxy(dmFactor = 0) {
-      const w = galaxyCanvas.width;
-      const h = galaxyCanvas.height;
-      const cx = w / 2;
-      const cy = h / 2;
-      gctx.clearRect(0, 0, w, h);
-
-      const maxHalo = w * 0.2 * (1 + 4 * dmFactor);
-      const gradient = gctx.createRadialGradient(cx, cy, 0, cx, cy, maxHalo);
-      gradient.addColorStop(0, `rgba(255, 0, 0, ${0.3 + 0.5 * dmFactor})`);
-      gradient.addColorStop(1, `rgba(0, 0, 0, 0)`);
-      gctx.fillStyle = gradient;
-      gctx.fillRect(0, 0, w, h);
-
-      for (const s of stars) {
-        const x = s.x * w;
-        const y = s.y * h;
-        gctx.beginPath();
-        gctx.arc(x, y, 1.2, 0, 2 * Math.PI);
-        gctx.fillStyle = `rgba(255, 230, 180, ${s.brightness})`;
-        gctx.fill();
+  // Least-squares halo fit (baryons fixed)
+  function fitHalo(){
+    let best = null;
+    for(let rc = 0.5; rc <= 12.0001; rc += 0.1){
+      let sf = 0, sff = 0;
+      for(let i=0;i<R_OBS.length;i++){
+        const d = V_OBS[i]*V_OBS[i] - v2bar(R_OBS[i]);
+        const f = pisoF(R_OBS[i], rc);
+        sf += f*d; sff += f*f;
       }
-    }
-
-    const r_values = [0.27, 0.54, 0.81, 1.08, 1.35, 1.62, 1.89, 2.15, 2.42];
-    const observed_base = [24800, 46200, 60500, 69600, 77500, 82900, 84100, 85600, 87600];
-    const expected_base = [40702, 50361, 54260, 55436, 55127, 54034, 52531, 50838, 49086];
-
-    const ctx = chartCanvas.getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: r_values,
-        datasets: [
-          {
-            label: 'Observed Velocity',
-            data: observed_base,
-            borderColor: '#ff4b4b',
-            borderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 4,
-            pointBackgroundColor: '#ff4b4b',
-            tension: 0.35
-          },
-          {
-            label: 'Calculated Velocity',
-            data: expected_base,
-            borderColor: '#00b4d8',
-            borderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 4,
-            pointBackgroundColor: '#00b4d8',
-            tension: 0.35
-          }
-        ]
-      },
-      options: {
-        maintainAspectRatio: false,
-        animation: { duration: 800, easing: 'easeOutQuart' },
-        plugins: {
-          legend: {
-            position: 'top',
-            labels: {
-              color: '#fff',
-              font: { size: 13 },
-              usePointStyle: true,
-              pointStyle: 'circle',
-              boxWidth: 4,
-              boxHeight: 4,
-              padding: 10
-            }
-          },
-          title: { display: false, color: '#fff', font: { size: 18 } }
-        },
-        scales: {
-          x: {
-            title: { display: true, text: 'Radius (×10²⁰ m) SPARC data Galaxy UGC06399', color: '#fff', font: { size: 14 } },
-            grid: { color: 'rgba(255,255,255,0.1)' },
-            ticks: { color: '#fff', font: { size: 12 } }
-          },
-          y: {
-            title: { display: true, text: 'Velocity (m/s)', color: '#fff', font: { size: 14 } },
-            min: 0,
-            max: 130000,
-            grid: { color: 'rgba(255,255,255,0.1)' },
-            ticks: { color: '#fff', font: { size: 12 } }
-          }
-        }
+      const vinf2 = sf/sff;
+      let chi = 0;
+      for(let i=0;i<R_OBS.length;i++){
+        const r = (V_OBS[i]*V_OBS[i] - v2bar(R_OBS[i])) - vinf2*pisoF(R_OBS[i], rc);
+        chi += r*r;
       }
+      if(!best || chi < best.chi) best = { rc, vinf2, chi };
+    }
+    return best;
+  }
+  const FIT = fitHalo();
+  const vTotal = (R,t) => Math.sqrt(v2bar(R) + t*t*FIT.vinf2*pisoF(R,FIT.rc));
+  const Mdm    = (R,t) => (t*t*FIT.vinf2/G)*FIT.rc*((R/FIT.rc) - Math.atan(R/FIT.rc));
+
+  let tVal = 0, crossCache = null;
+  function crossover(){
+    if(tVal < 0.05) return null;
+    for(let r=0.4; r<=9; r+=0.05){
+      if(tVal*tVal*FIT.vinf2*pisoF(r,FIT.rc) >= v2bar(r)) return r;
+    }
+    return null;
+  }
+  let rms = 0;
+  for(let i=0;i<R_OBS.length;i++){
+    const d = vTotal(R_OBS[i],1) - V_OBS[i]; rms += d*d;
+  }
+  rms = Math.sqrt(rms/R_OBS.length);
+
+  const GRID = [];
+  for(let r=0.35; r<=9.2; r+=0.11) GRID.push(+r.toFixed(3));
+  const fmtSci = x => { const e=Math.floor(Math.log10(x)), m=x/Math.pow(10,e);
+    return (m<1.05?'':m.toFixed(1)+'×')+'10<sup>'+e+'</sup>'; };
+
+  /* ================= SKY CANVAS ================= */
+  const sky = document.getElementById('sky');
+  const sctx = sky.getContext('2d');
+  let W=0, H=0, KPC=10, CX=0, CY=0, SS=1;
+  function fitSky(){
+    const r = sky.parentElement.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    sky.width = Math.round(r.width*dpr); sky.height = Math.round(r.height*dpr);
+    sctx.setTransform(dpr,0,0,dpr,0,0);
+    W = r.width; H = r.height;
+    KPC = Math.min(W,H)/34.7;
+    SS = Math.max(0.68, Math.min(1.1, KPC/31));
+    CX = W/2;
+    CY = Math.max(H*0.45, 7.84*KPC + 74);
+  }
+
+  // seeded RNG for reproducibility
+  let seed = 20260907;
+  const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed>>>15, 1 | seed);
+    t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t;
+    return ((t ^ t>>>14) >>> 0) / 4294967296; };
+  const expR = (a, rmax) => { let r; do { r = -a*Math.log(1-rnd()); } while(r>rmax); return r; };
+
+  const stars = [];
+  for(let i=0;i<430;i++){
+    const bul = rnd() < 0.3;
+    const rKpc = bul ? expR(0.9, 4.5) : expR(2.6, 7.84);
+    stars.push({ r:rKpc, th:rnd()*Math.PI*2, b:0.35+rnd()*0.65 });
+  }
+  const gasPts = [];
+  for(let i=0;i<230;i++) gasPts.push({ r:expR(3.8, 9.2), th:rnd()*Math.PI*2, b:0.12+rnd()*0.22 });
+  const haloPts = [];
+  for(let i=0;i<520;i++) haloPts.push({ r:14.5*Math.pow(rnd(),0.72), th:rnd()*Math.PI*2, b:0.1+rnd()*0.3 });
+  const backdrop = [];
+  for(let i=0;i<140;i++) backdrop.push({ x:rnd(), y:rnd(), b:0.05+rnd()*0.14 });
+
+  // soft star sprite
+  const sprite = document.createElement('canvas'); sprite.width = sprite.height = 32;
+  { const x = sprite.getContext('2d');
+    const g = x.createRadialGradient(16,16,0,16,16,16);
+    g.addColorStop(0,'rgba(255,250,235,1)'); g.addColorStop(0.3,'rgba(255,230,180,0.65)');
+    g.addColorStop(1,'rgba(255,220,150,0)');
+    x.fillStyle = g; x.fillRect(0,0,32,32); }
+
+  function rrect(x,y,w,h,r){
+    sctx.beginPath();
+    sctx.moveTo(x+r,y);
+    sctx.arcTo(x+w,y,x+w,y+h,r); sctx.arcTo(x+w,y+h,x,y+h,r);
+    sctx.arcTo(x,y+h,x,y,r); sctx.arcTo(x,y,x+w,y,r);
+    sctx.closePath();
+  }
+
+  /* ---------- hover state ---------- */
+  let mouse = null, mouseExp = 0;
+  function setMouse(e){
+    const rect = sky.getBoundingClientRect();
+    mouse = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    mouseExp = 0;
+  }
+  sky.addEventListener('pointermove', setMouse);
+  sky.addEventListener('pointerdown', setMouse);
+  sky.addEventListener('pointerleave', () => { mouse = null; });
+  sky.addEventListener('pointerup', e => {
+    if(e.pointerType === 'touch') mouseExp = performance.now() + 1600;
+  });
+
+  function hoverLines(r){
+    const vt = vTotal(r, tVal);
+    const vb = Math.sqrt(v2bar(r));
+    const vh = Math.sqrt(Math.max(0, tVal*tVal*FIT.vinf2*pisoF(r,FIT.rc)));
+    const L = [];
+    L.push({ t:`R = ${r.toFixed(1)} kpc`, c:'#e8ecf4' });
+    L.push({ t:`v = ${vt.toFixed(0)} km/s`, c:'#ffffff' });
+    L.push({ t:`baryons ${vb.toFixed(0)} · halo ${vh.toFixed(0)} km/s`, c:'#9fb3c8' });
+    let near = -1, nd = 0.3;
+    for(let i=0;i<R_OBS.length;i++){
+      const d = Math.abs(r - R_OBS[i]);
+      if(d < nd){ nd = d; near = i; }
+    }
+    if(near >= 0) L.push({ t:`observed: ${V_OBS[near].toFixed(1)} ± ${V_ERR[near].toFixed(1)} km/s`, c:'#ff8a8a' });
+    if(r > 9.6){
+      L.push({ t:'inside the dark matter halo (invisible — illustration)', c:'#d4baff' });
+      if(r > 14.3) L.push({ t:'halo continues well beyond this frame', c:'#8fa0b4' });
+    } else if(tVal > 0.05 && crossCache){
+      if(r > crossCache) L.push({ t:'dark matter dominates here', c:'#d4baff' });
+      else L.push({ t:'baryons dominate here', c:'#ffd54f' });
+    }
+    return L;
+  }
+
+  function drawHover(){
+    if(!mouse) return;
+    const dx = mouse.x - CX, dy = mouse.y - CY;
+    const r = Math.hypot(dx,dy)/KPC;
+    if(r > 16 || r < 0.05) return;
+
+    sctx.save();
+    sctx.setLineDash([4,4]);
+    sctx.strokeStyle = 'rgba(255,255,255,0.3)'; sctx.lineWidth = 1;
+    sctx.beginPath(); sctx.moveTo(CX,CY); sctx.lineTo(mouse.x,mouse.y); sctx.stroke();
+    sctx.strokeStyle = 'rgba(255,255,255,0.16)';
+    sctx.beginPath(); sctx.arc(CX,CY,r*KPC,0,6.284); sctx.stroke();
+    sctx.setLineDash([]);
+    sctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    sctx.beginPath();
+    sctx.moveTo(CX-5,CY); sctx.lineTo(CX+5,CY);
+    sctx.moveTo(CX,CY-5); sctx.lineTo(CX,CY+5);
+    sctx.stroke();
+    sctx.fillStyle = '#fff';
+    sctx.beginPath(); sctx.arc(mouse.x,mouse.y,2.4,0,6.284); sctx.fill();
+
+    const lines = hoverLines(r);
+    sctx.font = '11px Inter, sans-serif';
+    let tw = 0;
+    for(const l of lines) tw = Math.max(tw, sctx.measureText(l.t).width);
+    const pad = 8, lh = 15;
+    const bw = tw + pad*2, bh = lines.length*lh + pad*2 - 5;
+    let bx = mouse.x + 16, by = mouse.y - bh - 12;
+    if(bx + bw > W - 6) bx = mouse.x - bw - 16;
+    if(by < 6) by = mouse.y + 18;
+    if(bx < 6) bx = 6;
+    sctx.fillStyle = 'rgba(7,10,18,0.92)';
+    rrect(bx,by,bw,bh,6); sctx.fill();
+    sctx.strokeStyle = 'rgba(0,180,216,0.35)'; sctx.lineWidth = 1; sctx.stroke();
+    lines.forEach((l,i) => {
+      sctx.fillStyle = l.c;
+      sctx.fillText(l.t, bx + pad, by + pad + 4 + i*lh);
     });
+    sctx.restore();
+  }
 
-    const slider = document.getElementById('dmSlider');
-    const caption = document.getElementById('caption');
+  let lastT = performance.now();
+  function drawSky(dt){
+    sctx.clearRect(0,0,W,H);
 
-    function resizeCanvases() {
-      const wrapper = document.querySelector('.canvas-wrapper');
-      const w = wrapper.clientWidth;
-      const h = wrapper.clientHeight;
+    // backdrop
+    for(const b of backdrop){
+      sctx.globalAlpha = b.b; sctx.fillStyle = '#cfe3ff';
+      sctx.fillRect(b.x*W, b.y*H, 1, 1);
+    }
+    sctx.globalAlpha = 1;
 
-      galaxyCanvas.width = w;
-      galaxyCanvas.height = h;
-      chartCanvas.width = w;
-      chartCanvas.height = h;
-
-      drawGalaxy(parseFloat(slider.value));
-      chart.resize();
+    // dark matter halo — violet
+    if(tVal > 0.01){
+      const R = 15.2*KPC;
+      const g = sctx.createRadialGradient(CX,CY,0,CX,CY,R);
+      g.addColorStop(0,   `rgba(178,102,255,${0.34*tVal})`);
+      g.addColorStop(0.5, `rgba(124,58,217,${0.20*tVal})`);
+      g.addColorStop(1,   'rgba(94,53,177,0)');
+      sctx.fillStyle = g; sctx.fillRect(0,0,W,H);
+      for(const p of haloPts){
+        sctx.globalAlpha = tVal*p.b*0.85;
+        sctx.fillStyle = '#c9a2ff';
+        sctx.beginPath();
+        sctx.arc(CX + p.r*KPC*Math.cos(p.th), CY + p.r*KPC*Math.sin(p.th), 1.4*SS, 0, 6.284);
+        sctx.fill();
+      }
+      sctx.globalAlpha = 1;
+      sctx.setLineDash([5,5]);
+      sctx.strokeStyle = `rgba(197,151,255,${0.85*tVal})`; sctx.lineWidth = 1.4;
+      sctx.beginPath(); sctx.arc(CX,CY,14*KPC,0,6.284); sctx.stroke();
+      sctx.setLineDash([]);
     }
 
-    window.addEventListener('resize', resizeCanvases);
-
-    slider.addEventListener('input', () => {
-      const dm = parseFloat(slider.value);
-      const updated = expected_base.map((v,i)=>(1-dm)*v + dm*observed_base[i]);
-      chart.data.datasets[1].data = updated;
-      chart.update();
-      drawGalaxy(dm);
-
-      if (dm < 0.3) caption.textContent = "Rotation speed falls with distance.";
-      else if (dm < 0.7) caption.textContent = "Adding dark matter flattens the curve.";
-      else caption.textContent = "Rotation curve flat and the Dark matter halo extends far beyond visible stars.";
-    });
-
-    resizeCanvases();
-
-    // Copy URL function for the Share button using toast notifications
-    document.getElementById('shareButton').addEventListener('click', function() {
-      const link = window.location.href;
-      navigator.clipboard.writeText(link)
-        .then(() => showToast('Link copied to clipboard!'))
-        .catch(() => showToast('Failed to copy the link.'));
-    });
-
-    // Function to show a toast notification
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.style.visibility = 'visible';
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateY(0)';
-
-      // Hide after 3 seconds
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        setTimeout(() => toast.style.visibility = 'hidden', 500);
-      }, 3000);
+    // gas — cyan/teal
+    {
+      const g = sctx.createRadialGradient(CX,CY,0,CX,CY,9.2*KPC);
+      g.addColorStop(0,'rgba(38,198,218,0.12)'); g.addColorStop(1,'rgba(38,198,218,0)');
+      sctx.fillStyle = g; sctx.beginPath(); sctx.arc(CX,CY,9.2*KPC,0,6.284); sctx.fill();
+      sctx.fillStyle = '#4dd0e1';
+      for(const p of gasPts){
+        sctx.globalAlpha = p.b;
+        sctx.beginPath();
+        sctx.arc(CX+p.r*KPC*Math.cos(p.th), CY+p.r*KPC*Math.sin(p.th), Math.max(0.8,1.1*SS), 0, 6.284);
+        sctx.fill();
+      }
+      sctx.globalAlpha = 1;
     }
+
+    // stars with speed trails — all on the same clock
+    for(const s of stars){
+      const v = vTotal(s.r, tVal);
+      const om = v/s.r * 0.025;
+      s.th += om*dt;
+      const px = CX + s.r*KPC*Math.cos(s.th), py = CY + s.r*KPC*Math.sin(s.th);
+      const trailT = 0.03;
+      for(let j=6; j>=1; j--){
+        const a2 = s.th - om*trailT*j/6;
+        sctx.globalAlpha = s.b*0.4*(1 - j/7);
+        sctx.drawImage(sprite, CX + s.r*KPC*Math.cos(a2)-3*SS, CY + s.r*KPC*Math.sin(a2)-3*SS, 6*SS, 6*SS);
+      }
+      sctx.globalAlpha = s.b;
+      sctx.drawImage(sprite, px-3.4*SS, py-3.4*SS, 6.8*SS, 6.8*SS);
+    }
+    sctx.globalAlpha = 1;
+
+    drawHover();
+  }
+  function frame(now){
+    const dt = Math.min(0.05,(now-lastT)/1000); lastT = now;
+    if(mouse && mouseExp && now > mouseExp) mouse = null;
+    drawSky(dt);
+    requestAnimationFrame(frame);
+  }
+
+  /* ================= CHARTS ================= */
+  const errBars = { id:'errBars', afterDatasetsDraw(chart){
+    const di = chart.data.datasets.findIndex(d => d.errorBars); if(di < 0) return;
+    const meta = chart.getDatasetMeta(di), ys = chart.scales.y, ctx = chart.ctx;
+    ctx.save(); ctx.strokeStyle = 'rgba(255,75,75,0.85)'; ctx.lineWidth = 1.2;
+    meta.data.forEach((el,i) => {
+      const p = chart.data.datasets[di].data[i], e = chart.data.datasets[di].err[i];
+      const y1 = ys.getPixelForValue(p.y+e), y2 = ys.getPixelForValue(p.y-e);
+      ctx.beginPath();
+      ctx.moveTo(el.x,y1); ctx.lineTo(el.x,y2);
+      ctx.moveTo(el.x-3,y1); ctx.lineTo(el.x+3,y1);
+      ctx.moveTo(el.x-3,y2); ctx.lineTo(el.x+3,y2);
+      ctx.stroke();
+    }); ctx.restore(); } };
+
+  const obsPts = R_OBS.map((r,i) => ({ x:r, y:V_OBS[i] }));
+  const curveChart = new Chart(document.getElementById('curveChart'), {
+    type:'line',
+    data:{ datasets:[
+      { label:'Bulge', data:GRID.map(r=>({x:r,y:Math.sqrt(v2c(r,BULGE))})),
+        borderColor:'#ffc107', borderWidth:1.6, pointRadius:0, tension:.25 },
+      { label:'Disk + gas', data:GRID.map(r=>({x:r,y:Math.sqrt(v2c(r,DISK))})),
+        borderColor:'#26c6da', borderWidth:1.6, pointRadius:0, tension:.25 },
+      { label:'Dark matter halo (fitted)', data:GRID.map(r=>({x:r,y:Math.sqrt(FIT.vinf2*pisoF(r,FIT.rc))})),
+        borderColor:'#b266ff', borderWidth:2, borderDash:[6,4], pointRadius:0, tension:.25 },
+      { label:'Total (baryons + halo × t)', data:GRID.map(r=>({x:r,y:vTotal(r,0)})),
+        borderColor:'#f2f4fb', borderWidth:2.6, pointRadius:0, tension:.25 },
+      { type:'scatter', label:'Observed (SPARC UGC 06399)', data:obsPts, err:V_ERR, errorBars:true,
+        borderColor:'#ff4b4b', backgroundColor:'#ff4b4b', pointRadius:3.5, pointHoverRadius:5 }
+    ]},
+    options:{ maintainAspectRatio:false, animation:{duration:400},
+      plugins:{ legend:{ display:false },
+        tooltip:{ callbacks:{ title:(it)=>it[0].raw.x.toFixed(2)+' kpc',
+          label:(it)=>it.dataset.label+': '+it.parsed.y.toFixed(1)+' km/s' } } },
+      scales:{ x:{ type:'linear', min:0, max:9.5, title:{display:true,text:'Radius (kpc)',color:'#cfd8e3',font:{size:10}},
+          grid:{color:'rgba(255,255,255,.07)'}, ticks:{color:'#9aa3b2',font:{size:9}} },
+        y:{ min:0, max:100, title:{display:true,text:'Velocity (km/s)',color:'#cfd8e3',font:{size:10}},
+          grid:{color:'rgba(255,255,255,.07)'}, ticks:{color:'#9aa3b2',font:{size:9}} } } },
+    plugins:[errBars]
+  });
+
+  const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+  const sup = n => String(n).split('').map(c=>SUP[+c]).join('');
+  const massChart = new Chart(document.getElementById('massChart'), {
+    type:'line',
+    data:{ datasets:[
+      { label:'Bulge', data:GRID.filter(r=>r>=0.5&&r<=8).map(r=>({x:r,y:BULGE.M*Fexp(r/BULGE.a)})),
+        borderColor:'#ffc107', borderWidth:1.6, pointRadius:0 },
+      { label:'Disk + gas', data:GRID.filter(r=>r>=0.5&&r<=8).map(r=>({x:r,y:DISK.M*Fexp(r/DISK.a)})),
+        borderColor:'#26c6da', borderWidth:1.6, pointRadius:0 },
+      { label:'Dark matter halo', data:GRID.filter(r=>r>=0.5&&r<=8).map(r=>({x:r,y:Mdm(r,0)})),
+        borderColor:'#b266ff', borderWidth:2, borderDash:[6,4], pointRadius:0 },
+      { label:'Total', data:GRID.filter(r=>r>=0.5&&r<=8).map(r=>({x:r,y:Mbar(r)+Mdm(r,0)})),
+        borderColor:'#f2f4fb', borderWidth:2.4, pointRadius:0 },
+      { label:'M ∝ R (flat rotation curve)', data:[{x:0.6,y:1.13e9},{x:8,y:1.5e10}],
+        borderColor:'rgba(255,255,255,.35)', borderWidth:1.4, borderDash:[2,5], pointRadius:0 }
+    ]},
+    options:{ maintainAspectRatio:false, animation:{duration:400},
+      plugins:{ legend:{ display:false },
+        tooltip:{ callbacks:{ title:(it)=>it[0].raw.x.toFixed(2)+' kpc',
+          label:(it)=>it.dataset.label+': '+fmtSci(it.parsed.y)+' M☉' } } },
+      scales:{ x:{ type:'logarithmic', min:0.5, max:8, title:{display:true,text:'Radius (kpc)',color:'#cfd8e3',font:{size:10}},
+          grid:{color:'rgba(255,255,255,.07)'}, ticks:{color:'#9aa3b2',font:{size:9}} },
+        y:{ type:'logarithmic', min:1e8, max:3e10, title:{display:true,text:'Enclosed mass (M☉)',color:'#cfd8e3',font:{size:10}},
+          grid:{color:'rgba(255,255,255,.07)'},
+          ticks:{ color:'#9aa3b2', font:{size:9}, callback:v=>{
+            const l=Math.log10(v);
+            return Math.abs(l-Math.round(l))<1e-9 ? '10'+sup(Math.round(l)) : '';
+          } } } } }
+  });
+
+  /* ---------- responsive chart chrome ---------- */
+  function styleCharts(){
+    const w = Math.min(document.getElementById('curveBox').clientWidth,
+                       document.getElementById('massBox').clientWidth);
+    const tiny = w < 230, small = w < 380;
+    for(const c of [curveChart, massChart]){
+      const o = c.options;
+      o.scales.x.title.display = !tiny;
+      o.scales.y.title.display = !tiny;
+      o.scales.x.ticks.font.size = tiny ? 8 : (small ? 8.5 : 9);
+      o.scales.y.ticks.font.size = tiny ? 8 : (small ? 8.5 : 9);
+      c.update('none');
+    }
+  }
+
+  /* ---------- touch: tap a panel to reveal its legend ---------- */
+  document.querySelectorAll('.panel').forEach(p => {
+    p.addEventListener('pointerdown', e => {
+      if(e.pointerType !== 'touch') return;
+      p.classList.toggle('show-legend');
+      clearTimeout(p._t);
+      p._t = setTimeout(() => p.classList.remove('show-legend'), 2600);
+    });
+  });
+
+  /* ================= INTERACTION ================= */
+  const slider = document.getElementById('dmSlider');
+  const topctl = document.getElementById('topctl');
+
+  function update(){
+    tVal = parseFloat(slider.value);
+    crossCache = crossover();
+
+    curveChart.data.datasets[2].data = GRID.map(r=>({x:r, y:Math.sqrt(tVal*tVal*FIT.vinf2*pisoF(r,FIT.rc))}));
+    curveChart.data.datasets[3].data = GRID.map(r=>({x:r, y:vTotal(r,tVal)}));
+    curveChart.update('none');
+    massChart.data.datasets[2].data = GRID.filter(r=>r>=0.5&&r<=8).map(r=>({x:r,y:Mdm(r,tVal)}));
+    massChart.data.datasets[3].data = GRID.filter(r=>r>=0.5&&r<=8).map(r=>({x:r,y:Mbar(r)+Mdm(r,tVal)}));
+    massChart.update('none');
+  }
+  slider.addEventListener('input', update);
+
+  // touch: reveal the slider label while dragging, fade after release
+  slider.addEventListener('pointerdown', e => {
+    if(e.pointerType !== 'touch') return;
+    topctl.classList.add('show-label');
+    clearTimeout(topctl._t);
+  });
+  slider.addEventListener('pointerup', e => {
+    if(e.pointerType !== 'touch') return;
+    clearTimeout(topctl._t);
+    topctl._t = setTimeout(() => topctl.classList.remove('show-label'), 2000);
+  });
+  slider.addEventListener('pointercancel', () => {
+    clearTimeout(topctl._t);
+    topctl._t = setTimeout(() => topctl.classList.remove('show-label'), 2000);
+  });
+
+  /* ---------- fullscreen ---------- */
+  const fsBtn = document.getElementById('fsButton');
+  const fsSupported = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+  if(!fsSupported) fsBtn.hidden = true;
+
+  function fsElement(){ return document.fullscreenElement || document.webkitFullscreenElement; }
+  function setFsIcon(){
+    const on = !!fsElement();
+    fsBtn.classList.toggle('is-fs', on);
+    fsBtn.setAttribute('aria-label', on ? 'Exit fullscreen' : 'Enter fullscreen');
+    fsBtn.title = on ? 'Exit fullscreen' : 'Fullscreen';
+  }
+  async function toggleFs(){
+    const el = document.documentElement;
+    try{
+      if(fsElement()){
+        if(document.exitFullscreen) await document.exitFullscreen();
+        else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+      } else {
+        if(el.requestFullscreen) await el.requestFullscreen();
+        else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      }
+    }catch(e){ /* user/browser cancelled */ }
+  }
+  fsBtn.addEventListener('click', toggleFs);
+  ['fullscreenchange','webkitfullscreenchange'].forEach(ev =>
+    document.addEventListener(ev, () => {
+      setFsIcon();
+      requestAnimationFrame(() => { fitSky(); styleCharts(); });
+    })
+  );
+
+  window.addEventListener('resize', () => { fitSky(); styleCharts(); });
+
+  // share + toast
+  document.getElementById('shareButton').addEventListener('click', function(){
+    navigator.clipboard.writeText(window.location.href)
+      .then(() => showToast('Link copied to clipboard!'))
+      .catch(() => showToast('Failed to copy the link.'));
+  });
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.visibility='visible'; t.style.opacity='1'; t.style.transform='translateY(0)';
+    setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(20px)';
+      setTimeout(() => t.style.visibility='hidden', 500); }, 3000);
+  }
+
+  fitSky(); update(); styleCharts(); requestAnimationFrame(frame);
+
+  // one-time reveal on load (remove this block if unwanted)
+  topctl.classList.add('show-label');
+  setTimeout(() => { if(!topctl.matches(':hover')) topctl.classList.remove('show-label'); }, 2800);
   </script>
 </body>
 </html>

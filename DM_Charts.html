@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-104TPV326N"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-104TPV326N');
+  </script>
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-TRGMTJZG');</script>
+  <!-- End Google Tag Manager -->
+
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galaxy Rotation Curve & Dark Matter Halo</title>
+
+  <!-- ✅ SEO Meta Tags -->
+  <meta name="description" content="Explore how dark matter affects galaxy rotation curves through an interactive simulation. Adjust the dark matter halo and see how it changes stellar velocity across galactic radii." />
+  <meta name="keywords" content="galaxy rotation curve, dark matter halo, dark matter simulation, astrophysics, galaxy velocity, astronomy data visualization, SPARC data, Milky Way rotation, cosmic physics" />
+  <meta name="author" content="Galaxy Rotation Curve Project" />
+  <meta property="og:title" content="Galaxy Rotation Curve & Dark Matter Halo Interactive Simulation" />
+  <meta property="og:description" content="Interactive tool to visualize how dark matter influences galactic rotation curves using SPARC data." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Galaxy Rotation Curve & Dark Matter Halo" />
+  <meta name="twitter:description" content="Visualize the impact of dark matter on galactic motion with this interactive physics demo." />
+
+
+
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+
+
+  <style>
+    body {
+      margin: 0;
+      background: #05070d;
+      color: #eaeaea;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    .container {
+      max-width: 800px;
+      margin: 3rem auto;
+      padding: 2rem;
+      border-radius: 20px;
+      background: radial-gradient(circle at center, #0b0e18 0%, #05070d 100%);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 50%;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 110%;
+    }
+    .slider-section {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    input[type="range"] {
+      width: 70%;
+      appearance: none;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #ff4b4b 0%, #1976d2 100%);
+      outline: none;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 0%, #00b4d8 80%);
+      box-shadow: 0 0 15px #00b4d8, 0 0 20px #ff4b4b;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      border: 2px solid #fff;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.3);
+      box-shadow: 0 0 25px #00b4d8, 0 0 30px #ff4b4b;
+    }
+    #caption {
+      color: #bbb;
+      margin-top: 0.3rem;
+      font-size: 0.95rem;
+      font-style: italic;
+    }
+    .slider-section label {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #00b4d8;
+      cursor: pointer;
+    }
+
+    /* Share button styles */
+    #shareButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 8px 12px;
+      background-color: #00b4d8;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #shareButton:hover {
+      background-color: #ff4b4b;
+    }
+
+    .canvas-wrapper:hover #shareButton {
+      opacity: 1;
+    }
+
+    /* Toast notification */
+    #toast {
+      visibility: hidden;
+      min-width: 200px;
+      margin-left: -100px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 10px;
+      position: fixed;
+      z-index: 999;
+      left: 50%;
+      bottom: 30px;
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TRGMTJZG"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+
+  <div class="container">
+    <div class="canvas-wrapper">
+      <canvas id="galaxyCanvas"></canvas>
+      <canvas id="chartCanvas"></canvas>
+      <button id="shareButton">Share Link</button>
+    </div>
+
+    <div class="slider-section">
+      <label for="mezziSlider" style="font-size: 24px;"><b>Add Dark Matter</b></label>
+      <br />
+      <input type="range" id="dmSlider" min="0" max="1" step="0.01" value="0" />
+      <div id="caption">
+        Newtonian model results do not align with observed flat rotation curves.
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast"></div>
+
+  <script>
+    const galaxyCanvas = document.getElementById("galaxyCanvas");
+    const chartCanvas = document.getElementById("chartCanvas");
+    const gctx = galaxyCanvas.getContext("2d");
+
+    const stars = [];
+    const STAR_COUNT = 400;
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const r = Math.random() * 100;
+      const angle = Math.random() * 2 * Math.PI;
+      stars.push({
+        x: 0.5 + (r / 200) * Math.cos(angle),
+        y: 0.5 + (r / 200) * Math.sin(angle),
+        brightness: Math.random() * 0.8 + 0.2
+      });
+    }
+
+    function drawGalaxy(dmFactor = 0) {
+      const w = galaxyCanvas.width;
+      const h = galaxyCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      gctx.clearRect(0, 0, w, h);
+
+      const maxHalo = w * 0.2 * (1 + 4 * dmFactor);
+      const gradient = gctx.createRadialGradient(cx, cy, 0, cx, cy, maxHalo);
+      gradient.addColorStop(0, `rgba(255, 0, 0, ${0.3 + 0.5 * dmFactor})`);
+      gradient.addColorStop(1, `rgba(0, 0, 0, 0)`);
+      gctx.fillStyle = gradient;
+      gctx.fillRect(0, 0, w, h);
+
+      for (const s of stars) {
+        const x = s.x * w;
+        const y = s.y * h;
+        gctx.beginPath();
+        gctx.arc(x, y, 1.2, 0, 2 * Math.PI);
+        gctx.fillStyle = `rgba(255, 230, 180, ${s.brightness})`;
+        gctx.fill();
+      }
+    }
+
+    const r_values = [0.27, 0.54, 0.81, 1.08, 1.35, 1.62, 1.89, 2.15, 2.42];
+    const observed_base = [24800, 46200, 60500, 69600, 77500, 82900, 84100, 85600, 87600];
+    const expected_base = [40702, 50361, 54260, 55436, 55127, 54034, 52531, 50838, 49086];
+
+    const ctx = chartCanvas.getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: r_values,
+        datasets: [
+          {
+            label: 'Observed Velocity',
+            data: observed_base,
+            borderColor: '#ff4b4b',
+            borderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 4,
+            pointBackgroundColor: '#ff4b4b',
+            tension: 0.35
+          },
+          {
+            label: 'Calculated Velocity',
+            data: expected_base,
+            borderColor: '#00b4d8',
+            borderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 4,
+            pointBackgroundColor: '#00b4d8',
+            tension: 0.35
+          }
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        animation: { duration: 800, easing: 'easeOutQuart' },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: '#fff',
+              font: { size: 13 },
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 4,
+              boxHeight: 4,
+              padding: 10
+            }
+          },
+          title: { display: false, color: '#fff', font: { size: 18 } }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: 'Radius (×10²⁰ m) SPARC data Galaxy UGC06399', color: '#fff', font: { size: 14 } },
+            grid: { color: 'rgba(255,255,255,0.1)' },
+            ticks: { color: '#fff', font: { size: 12 } }
+          },
+          y: {
+            title: { display: true, text: 'Velocity (m/s)', color: '#fff', font: { size: 14 } },
+            min: 0,
+            max: 130000,
+            grid: { color: 'rgba(255,255,255,0.1)' },
+            ticks: { color: '#fff', font: { size: 12 } }
+          }
+        }
+      }
+    });
+
+    const slider = document.getElementById('dmSlider');
+    const caption = document.getElementById('caption');
+
+    function resizeCanvases() {
+      const wrapper = document.querySelector('.canvas-wrapper');
+      const w = wrapper.clientWidth;
+      const h = wrapper.clientHeight;
+
+      galaxyCanvas.width = w;
+      galaxyCanvas.height = h;
+      chartCanvas.width = w;
+      chartCanvas.height = h;
+
+      drawGalaxy(parseFloat(slider.value));
+      chart.resize();
+    }
+
+    window.addEventListener('resize', resizeCanvases);
+
+    slider.addEventListener('input', () => {
+      const dm = parseFloat(slider.value);
+      const updated = expected_base.map((v,i)=>(1-dm)*v + dm*observed_base[i]);
+      chart.data.datasets[1].data = updated;
+      chart.update();
+      drawGalaxy(dm);
+
+      if (dm < 0.3) caption.textContent = "Rotation speed falls with distance.";
+      else if (dm < 0.7) caption.textContent = "Adding dark matter flattens the curve.";
+      else caption.textContent = "Rotation curve flat and the Dark matter halo extends far beyond visible stars.";
+    });
+
+    resizeCanvases();
+
+    // Copy URL function for the Share button using toast notifications
+    document.getElementById('shareButton').addEventListener('click', function() {
+      const link = window.location.href;
+      navigator.clipboard.writeText(link)
+        .then(() => showToast('Link copied to clipboard!'))
+        .catch(() => showToast('Failed to copy the link.'));
+    });
+
+    // Function to show a toast notification
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.visibility = 'visible';
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+
+      // Hide after 3 seconds
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.style.visibility = 'hidden', 500);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
